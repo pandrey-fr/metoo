@@ -1,6 +1,6 @@
 # coding: utf-8
 
-"""Class to buils networkx graph objects out of MeToo twitter data."""
+"""Class to build networkx graph objects out of MeToo twitter data."""
 
 import os
 
