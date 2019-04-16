@@ -7,7 +7,7 @@ import os
 
 import pandas as pd
 
-from metoo.data import MeTooDataLoader
+from metoo import MeTooDataLoader
 
 
 class MeTooDataExtractor:
