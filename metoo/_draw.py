@@ -57,6 +57,7 @@ class MeTooGraphDrawer:
         See documentation of the former for details.
         """
         # arguments serve modularity; pylint: disable=too-many-arguments
+        # variables serve readability; pylint: disable=too-many-locals
         # Set up the output directory if needed.
         imagedir = os.path.abspath(imagedir)
         if not os.path.isdir(imagedir):
