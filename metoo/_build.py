@@ -27,7 +27,9 @@ class MeTooGraphBuilder:
         # Load basic users data.
         self.users = self._get_data('users.csv', index_col=0)
 
-    def build_graphs_set(self, min_retweeted=0, keep_single=True):
+    def build_graphs_set(
+            self, min_retweeted=0, keep_single=True, connected=False
+        ):
         """Build networkx.DiGraph representations of the network through time.
 
         Select the users to consider based on the activity they generated
@@ -41,6 +43,8 @@ class MeTooGraphBuilder:
         keep_single   : whether to keep nodes that have no edges at
                         any date (i.e. people retweeting or being retweeted
                         by users not included in the dataset)
+        connected     : whether to keep only the biggest subcomponent of
+                        the graph (overriding the previous argument)
         """
         # List the available data dates.
         dates = [name[6:-4] for name in self._files if name.startswith('node')]
@@ -49,11 +53,14 @@ class MeTooGraphBuilder:
         last = self.build_graph(
             dates[-1], min_retweeted=min_retweeted, keep_single=keep_single
         )
-        nodes = list(last.nodes)
+        # Optionally restrict the graph to its biggest connected component.
+        if connected:
+            last = self.get_biggest_component(last)
         # Build graphs restricted to the selected nodes at each date.
+        nodes = list(last.nodes)
         graphs = {date: self.build_graph(date, nodes) for date in dates[:-1]}
-        graphs[dates[-1]] = last
         # Return the built graphs.
+        graphs[dates[-1]] = last
         return graphs
 
     def build_graph(
@@ -141,3 +148,29 @@ class MeTooGraphBuilder:
             raise RuntimeError(
                 "File '%s' has been removed from datadir." % filename
             )
+
+    @staticmethod
+    def get_biggest_component(graph):
+        """Return the biggest connected subgraph out of a directed graph.
+
+        The notion of 'connected' graph is here extended to directed
+        graphs, as a graph where each node is connected to at least
+        another one in at least one direction.
+        """
+        # Make an undirected copy of the graph and split it into components.
+        undirected = graph.to_undirected(as_view=True)
+        components = nx.connected_component_subgraphs(undirected)
+        # Find the longest connected component in the undirected graph.
+        longest = next(components)
+        for component in components:
+            if len(component) > len(longest):
+                longest = component
+        # Build a directed subgraph corresponding to the identified component.
+        subgraph = nx.DiGraph()
+        subgraph.add_nodes_from(longest.nodes(data=True))
+        subgraph.add_edges_from([
+            edge for edge in graph.edges(data=True)
+            if edge[:2] in longest.edges
+        ])
+        # Return the subgraph.
+        return subgraph
