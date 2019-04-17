@@ -35,8 +35,8 @@ class MeTooGraphDrawer:
         self.edge_size_limits = edge_size_limits
 
     def draw_graphs_set(
-            self, graphs, imagedir, make_video=True, node_size=None,
-            node_color=None, edge_size=None, edge_color=None,
+            self, graphs, imagedir, video=True, layout='fruchterman_reingold',
+            node_size=None, node_color=None, edge_size=None, edge_color=None,
             node_labels=False, **kwargs
         ):
         """Draw and save successive representations of a network.
@@ -44,12 +44,14 @@ class MeTooGraphDrawer:
         This function is meant to be passed the dict resulting from
         calling the `MeTooGraphBuilder.build_graphs_set` method.
 
-        graphs     : dict containing various states of the MeToo graph,
-                     indexed by the date they correspond to
-        imagedir   : directory where to output drawn figures
-        make_video : whether to make an mp4 video rendering based
-                     on the produced images (bool, default True)
-                     (only valid if cv2 module is installed)
+        graphs   : dict containing various states of the MeToo graph,
+                   indexed by the date they correspond to
+        imagedir : directory where to output drawn figures
+        video    : whether to make an mp4 video rendering based
+                   on the produced images (bool, default True)
+                   (only valid if cv2 module is installed)
+        layout   : name (str) of the networkx layout to use
+                   (default 'fruchterman_reingold')
 
         Remaining arguments are those of `MeTooGraphDrawer.draw_graph`.
         See documentation of the former for details.
@@ -60,7 +62,8 @@ class MeTooGraphDrawer:
         if not os.path.isdir(imagedir):
             os.makedirs(imagedir)
         # Compute nodes position once and for all based on final state.
-        positions = nx.fruchterman_reingold_layout(graphs[list(graphs)[-1]])
+        layout = getattr(nx, layout + '_layout')
+        positions = layout(graphs[list(graphs)[-1]])
         # Iteratively draw and save figures of the graph at each date.
         for date, graph in graphs.items():
             figure = self.draw_graph(
@@ -71,7 +74,7 @@ class MeTooGraphDrawer:
             figure.savefig(os.path.join(imagedir, 'network_%s.png' % date))
             plt.close(figure)
         # Optionally make a video rendering out of the produced images.
-        if make_video and VIDEO_FEATURES:
+        if video and VIDEO_FEATURES:
             self.make_video(os.path.join(imagedir, 'video.mp4'), imagedir)
 
     def draw_graph(
