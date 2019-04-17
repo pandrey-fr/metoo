@@ -20,8 +20,10 @@ data processing, vizualisation and analysis pipepline:
 
 * Network analysis classes:
   * `MeTooGraphBuilder` builds `networkx.DiGraph` instances based
-  on the extracted data
+    on the extracted data
   * `MeTooGraphDrawer` draws visual representations of the former graphs
+  * `MeTooGraphAnalyzer` computes network-wide and user-wise statistics
+    characterizing the former graphs
 
 #### License
 
