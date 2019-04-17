@@ -231,10 +231,12 @@ class MeTooGraphDrawer:
         # Setup the nodes' display positions. Setup a video writer.
         # false positives on cv2 elements; pylint: disable=no-member
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        size = tuple([value * 10 for value in self.figsize])
+        size = tuple([value * 100 for value in self.figsize])
         video = cv2.VideoWriter(output, fourcc, fps, size, True)
         # Iteratively produce and write the graph's representation.
         for name in sorted(os.listdir(imagedir)):
+            if not name.endswith('.png'):
+                continue
             image = cv2.imread(os.path.join(imagedir, name))
             image = cv2.resize(image, size)
             video.write(image)
