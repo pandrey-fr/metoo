@@ -50,6 +50,7 @@ class MeTooGraphBuilder:
         dates = [name[6:-4] for name in self._files if name.startswith('node')]
         dates = sorted(dates)
         # Get the last graph and select nodes based on final activity.
+        keep_single = (not connected) and keep_single
         last = self.build_graph(
             dates[-1], min_retweeted=min_retweeted, keep_single=keep_single
         )
