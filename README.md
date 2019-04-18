@@ -7,6 +7,20 @@ which contains pre-processed tweets collected between November 29th and
 December 25th, 2017 by Brett Turner (initial source
 [here](https://data.world/balexturner/390-000-metoo-tweets)).
 
+
+#### Results-production pipepline
+
+To run a basic results-production pipeline, simply download a copy of the
+code and of the dataset, then edit the `pipepline.py` file to set up the
+constants appropriately (lines 13 to 15) and run `python3 pipepline.py`.
+
+This will build graphs set, output .gexf files of the final network states
+for exploitation with Gephi, output visualizations of the network's evolution
+(including a video file if the `cv2` package is installed) and finally dump
+to a .pickle file the graphs built and metrics computed to help characterize
+them and their evolution.
+
+
 #### Organization of the implemented tools
 
 The code is structured in classes that all aim at a specific part of the
